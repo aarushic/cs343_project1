@@ -129,8 +129,25 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     #fringe is a priority queue
-    fringe = PriorityQueue()
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    closedSet = set()
+    #(state, actions) and cost (priority)
+    fringe.push((problem.getStartState(), [], 0), 0)
+
+    while not fringe.isEmpty():
+        state, actions, cost = fringe.pop()
+
+        if problem.isGoalState(state):
+            return actions
+
+        if state not in closedSet:
+            closedSet.add(state)
+            for successor, action, incCost in problem.getSuccessors(state):
+                if successor not in closedSet:
+                    addAction = actions + [action]
+                    addCost = cost + incCost
+                    fringe.push((successor, addAction, addCost), addCost)
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -142,7 +159,28 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    closedSet = set()
+    startState = problem.getStartState()
+    heuristicCost = heuristic(startState, problem)
+    fringe.push((startState, [], 0), 0 + heuristicCost)
+
+    while not fringe.isEmpty():
+        state, actions, cost = fringe.pop()
+
+        if problem.isGoalState(state):
+            return actions
+
+        if state not in closedSet:
+            closedSet.add(state)
+            for successor, action, incCost in problem.getSuccessors(state):
+                if successor not in closedSet:
+                    addAction = actions + [action]
+                    #f(n) = g(n) + h(n)
+                    addCost = cost + incCost
+                    heuristicCost = heuristic(successor, problem)
+                    fringe.push((successor, addAction, addCost), addCost + heuristicCost)
+    return []
 
 
 # Abbreviations
