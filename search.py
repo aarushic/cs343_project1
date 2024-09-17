@@ -88,10 +88,14 @@ def depthFirstSearch(problem):
     """
     fringe = util.Stack()
     closedSet = set()
-    fringe.push((problem.getStartState(), []))
+    fringeSet = set()
+    startState = problem.getStartState()
+    fringe.push((startState, []))
+    fringeSet.add(startState)
 
     while not fringe.isEmpty():
         state, actions = fringe.pop()
+        fringeSet.remove(state)
 
         if problem.isGoalState(state):
             return actions
@@ -99,31 +103,42 @@ def depthFirstSearch(problem):
         if state not in closedSet:
             closedSet.add(state)
     
-        for successor in problem.getSuccessors(state):
-            if successor[0] not in closedSet:
-                addAction = actions + [successor[1]]
-                fringe.push((successor[0], addAction))
+            for successor in problem.getSuccessors(state):
+                if successor[0] not in closedSet and successor[0] not in fringeSet:
+                    addAction = actions + [successor[1]]
+                    fringe.push((successor[0], addAction))
+                    fringeSet.add(successor[0])
     return []    
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     fringe = util.Queue()
     closedSet = set()
-    fringe.push((problem.getStartState(), []))
+    fringeSet = set()
+    startState = problem.getStartState()
+
+    if problem.isGoalState(startState):
+        return actions
+    
+    fringe.push((startState, []))
+    fringeSet.add(startState)
 
     while not fringe.isEmpty():
         state, actions = fringe.pop()
+        fringeSet.remove(state)
 
         if problem.isGoalState(state):
             return actions
-        
+
         if state not in closedSet:
             closedSet.add(state)
-            for successors in problem.getSuccessors(state):
-                if successors[0] not in closedSet:
-                    addAction = actions + [successors[1]]
-                    fringe.push((successors[0], addAction))
-    return []    
+            
+            for successor in problem.getSuccessors(state):
+                if successor[0] not in closedSet and successor[0] not in fringeSet:
+                    addAction = actions + [successor[1]]
+                    fringe.push((successor[0], addAction))
+                    fringeSet.add(successor[0])
+    return []                    
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -131,12 +146,12 @@ def uniformCostSearch(problem):
     #fringe is a priority queue
     fringe = util.PriorityQueue()
     closedSet = set()
+    #add fringe set?
     #(state, actions) and cost (priority)
     fringe.push((problem.getStartState(), [], 0), 0)
 
     while not fringe.isEmpty():
         state, actions, cost = fringe.pop()
-
         if problem.isGoalState(state):
             return actions
 

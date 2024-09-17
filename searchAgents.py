@@ -295,14 +295,17 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (self.startingPosition, (False, False, False, False))
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for corner in state[1]:
+            if not corner:
+                return False
+        return True
 
     def getSuccessors(self, state):
         """
@@ -314,8 +317,8 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
         successors = []
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -325,6 +328,20 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            #change up logic a bit
+            
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            if not hitsWall:
+                corners = list(state[1])
+                nextPos = (nextx, nexty)
+                if nextPos in self.corners:
+                    corners[self.corners.index(nextPos)] = True
+            
+                successors.append(((nextPos, tuple(corners)), action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -356,11 +373,48 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    # is this even right how do u test
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    
+    #boolean of visited corners
+    #first element is Pacman’s current position, and the second element is a tuple of booleans representing whether each of the four corners has been visited or not
+
+    #goal - all four corners have been visited
+
+    #shortest distance to visit all remaining corners can be estimated by summing the distances between them in an optimal order
+        #Manhattan distance from Pacman’s current position to the closest unvisited corner, and then from that corner to the next unvisited one, and so on
+    
+    totalDistance = 0
+    if problem.isGoalState():
+        return totalDistance
+    
+    currentState = state[0]
+    visitedCorners = state[1]
+
+    #list of unvisited corners
+    unvisitedCorners = []
+    for i, corner in enumerate(corners):
+        if not visitedCorners[i]:  # If the corner hasn't been visited
+            unvisitedCorners.append(corner)  # Add the unvisited corner to the list
+
+    #check goal state?
+    if not unvisitedCorners:
+        return 0
+
+    currentPos = currentState
+
+    # A simple greedy heuristic: keep going to the nearest unvisited corner
+    while unvisitedCorners:
+        distances = [util.manhattanDistance(currentPos, corner) for corner in unvisitedCorners]
+        minDistance = min(distances)
+        totalDistance += minDistance
+        currentPos = unvisitedCorners[distances.index(minDistance)]
+        unvisitedCorners.remove(currentPos)
+
+    return totalDistance
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
