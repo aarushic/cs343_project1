@@ -88,14 +88,11 @@ def depthFirstSearch(problem):
     """
     fringe = util.Stack()
     closedSet = set()
-    fringeSet = set()
     startState = problem.getStartState()
     fringe.push((startState, []))
-    fringeSet.add(startState)
 
     while not fringe.isEmpty():
         state, actions = fringe.pop()
-        fringeSet.remove(state)
 
         if problem.isGoalState(state):
             return actions
@@ -104,10 +101,9 @@ def depthFirstSearch(problem):
             closedSet.add(state)
     
             for successor in problem.getSuccessors(state):
-                if successor[0] not in closedSet and successor[0] not in fringeSet:
+                if successor[0] not in closedSet:
                     addAction = actions + [successor[1]]
                     fringe.push((successor[0], addAction))
-                    fringeSet.add(successor[0])
     return []    
 
 def breadthFirstSearch(problem):

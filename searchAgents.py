@@ -359,7 +359,7 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-
+#ASK TA IF CONSISTENT
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -373,48 +373,24 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    # is this even right how do u test
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    maxDist = 0
+    if problem.isGoalState(state):
+        return maxDist
     
-    #boolean of visited corners
-    #first element is Pacman’s current position, and the second element is a tuple of booleans representing whether each of the four corners has been visited or not
-
-    #goal - all four corners have been visited
-
-    #shortest distance to visit all remaining corners can be estimated by summing the distances between them in an optimal order
-        #Manhattan distance from Pacman’s current position to the closest unvisited corner, and then from that corner to the next unvisited one, and so on
+    visitedCorner = state[1]
+    startPos = state[0]
     
-    totalDistance = 0
-    if problem.isGoalState():
-        return totalDistance
+    for index, corner in enumerate(visitedCorner):
+        if not corner:
+            unvisitedCorner = corners[index]
+            currDist = util.manhattanDistance(startPos, unvisitedCorner)
+            maxDist = max(currDist, maxDist)
     
-    currentState = state[0]
-    visitedCorners = state[1]
-
-    #list of unvisited corners
-    unvisitedCorners = []
-    for i, corner in enumerate(corners):
-        if not visitedCorners[i]:  # If the corner hasn't been visited
-            unvisitedCorners.append(corner)  # Add the unvisited corner to the list
-
-    #check goal state?
-    if not unvisitedCorners:
-        return 0
-
-    currentPos = currentState
-
-    # A simple greedy heuristic: keep going to the nearest unvisited corner
-    while unvisitedCorners:
-        distances = [util.manhattanDistance(currentPos, corner) for corner in unvisitedCorners]
-        minDistance = min(distances)
-        totalDistance += minDistance
-        currentPos = unvisitedCorners[distances.index(minDistance)]
-        unvisitedCorners.remove(currentPos)
-
-    return totalDistance
+    return maxDist
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -478,6 +454,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
+#COME BACK 
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -508,7 +485,17 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    maxDist = 0
+    if problem.isGoalState(state):
+        return maxDist
+    foodCoords = foodGrid.asList()
+    for food in foodCoords:
+        currDist = util.manhattanDistance(position, food)
+        maxDist = max(currDist, maxDist)
+
+    #maybe use maze distance?
+    return maxDist 
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -539,7 +526,8 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.breadthFirstSearch(problem)
+
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -574,8 +562,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         x,y = state
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if self.food[x][y]:
+            return True
+        return False
 
 def mazeDistance(point1, point2, gameState):
     """
