@@ -327,9 +327,7 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
-            #change up logic a bit
-            
+            "*** YOUR CODE HERE ***"            
             x,y = state[0]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
@@ -340,7 +338,6 @@ class CornersProblem(search.SearchProblem):
                 nextPos = (nextx, nexty)
                 if nextPos in self.corners:
                     corners[self.corners.index(nextPos)] = True
-            
                 successors.append(((nextPos, tuple(corners)), action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
@@ -359,7 +356,6 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-#ASK TA IF CONSISTENT
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -454,7 +450,6 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
-#COME BACK 
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -485,17 +480,22 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    maxDist = 0
+    minDist = float('inf')
     if problem.isGoalState(state):
-        return maxDist
+        return 0
+    
     foodCoords = foodGrid.asList()
     for food in foodCoords:
         currDist = util.manhattanDistance(position, food)
-        maxDist = max(currDist, maxDist)
+        minDist = min(currDist, minDist)
 
-    #maybe use maze distance?
-    return maxDist 
+    maxFood = 0
+    for i in range(0, len(foodCoords)):
+        for j in range(i + 1, len(foodCoords)):
+            currDist = util.manhattanDistance(foodCoords[i], foodCoords[j])
+            maxFood = max(maxFood, currDist)
 
+    return minDist + maxFood
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -561,7 +561,6 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
         if self.food[x][y]:
             return True
         return False

@@ -99,7 +99,6 @@ def depthFirstSearch(problem):
 
         if state not in closedSet:
             closedSet.add(state)
-    
             for successor in problem.getSuccessors(state):
                 if successor[0] not in closedSet:
                     addAction = actions + [successor[1]]
@@ -128,7 +127,6 @@ def breadthFirstSearch(problem):
 
         if state not in closedSet:
             closedSet.add(state)
-            
             for successor in problem.getSuccessors(state):
                 if successor[0] not in closedSet and successor[0] not in fringeSet:
                     addAction = actions + [successor[1]]
@@ -142,7 +140,6 @@ def uniformCostSearch(problem):
     #fringe is a priority queue
     fringe = util.PriorityQueue()
     closedSet = set()
-    #add fringe set?
     #(state, actions) and cost (priority)
     fringe.push((problem.getStartState(), [], 0), 0)
 
@@ -190,6 +187,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     #f(n) = g(n) + h(n)
                     addCost = cost + incCost
                     heuristicCost = heuristic(successor, problem)
+                    #priority is total cost
                     fringe.push((successor, addAction, addCost), addCost + heuristicCost)
     return []
 
